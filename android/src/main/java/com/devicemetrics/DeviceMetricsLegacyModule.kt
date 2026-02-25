@@ -1,8 +1,8 @@
 package com.devicemetrics
 
 import android.util.Log
-import com.facebook.react.bridge.*
-import com.facebook.react.modules.core.DeviceEventManagerModule
+import androidx.lifecycle.Observer
+import androidx.lifecycle.LiveData
 import com.blinkit.droiddex.DroidDex
 import com.blinkit.droiddex.models.*
 import com.blinkit.droiddex.battery.models.*
@@ -10,12 +10,18 @@ import com.blinkit.droiddex.cpu.models.*
 import com.blinkit.droiddex.memory.models.*
 import com.blinkit.droiddex.network.models.*
 import com.blinkit.droiddex.storage.models.*
-import androidx.lifecycle.Observer
-import androidx.lifecycle.LiveData
+import com.facebook.react.bridge.*
+import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.bridge.UiThreadUtil
 import org.json.JSONObject
 
-class DeviceMetricsModule(reactContext: ReactApplicationContext) :
-  NativeDeviceMetricsSpec(reactContext) {
+class DeviceMetricsLegacyModule(
+  reactContext: ReactApplicationContext
+) : ReactContextBaseJavaModule(reactContext) {
+
+  companion object {
+    const val NAME = "DeviceMetrics"
+  }
 
   // Raw collection state
   private var activeObserver: Observer<RawPerformanceDataResult>? = null
@@ -27,10 +33,13 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
   private var activeDetailedLiveData: LiveData<DetailedPerformanceDataResult>? = null
   @Volatile private var latestDetailedData: DetailedPerformanceDataResult? = null
 
+  override fun getName(): String = NAME
+
   // ---------- Init ----------
 
-  override fun init(thresholds: String?, promise: Promise) {
-    reactApplicationContext.runOnUiQueueThread {
+  @ReactMethod
+  fun init(thresholds: String?, promise: Promise) {
+    UiThreadUtil.runOnUiThread {
       try {
         val customThresholds = if (thresholds != null) {
           parseThresholdsFromJson(thresholds)
@@ -54,22 +63,23 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
 
   // ---------- Raw collection ----------
 
-  override fun startRawPerformanceDataCollection(
+  @ReactMethod
+  fun startRawPerformanceDataCollection(
     classes: ReadableArray,
     delay: Double,
     promise: Promise
   ) {
     try {
-      val performanceClasses = IntArray(classes.size()) { classes.getInt(it) }
+      val perfClasses = IntArray(classes.size()) { classes.getInt(it) }
 
-      reactApplicationContext.runOnUiQueueThread {
+      UiThreadUtil.runOnUiThread {
         try {
           // Clean up any existing observer before starting
           removeActiveObserver()
           DroidDex.stopRawPerformanceDataCollection()
 
           val liveData = DroidDex.startRawPerformanceDataCollection(
-            *performanceClasses,
+            *perfClasses,
             delaySeconds = delay.toInt().coerceAtLeast(1)
           )
 
@@ -105,12 +115,13 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun updateRawPerformanceDataCollection(
+  @ReactMethod
+  fun updateRawPerformanceDataCollection(
     delay: Double,
     promise: Promise
   ) {
     try {
-      reactApplicationContext.runOnUiQueueThread {
+      UiThreadUtil.runOnUiThread {
         try {
           val updated = DroidDex.updateRawPerformanceDataCollection(
             delaySeconds = delay.toInt().coerceAtLeast(1)
@@ -126,8 +137,9 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun stopRawPerformanceDataCollection(promise: Promise) {
-    reactApplicationContext.runOnUiQueueThread {
+  @ReactMethod
+  fun stopRawPerformanceDataCollection(promise: Promise) {
+    UiThreadUtil.runOnUiThread {
       try {
         removeActiveObserver()
         DroidDex.stopRawPerformanceDataCollection()
@@ -142,7 +154,8 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
   // In native Android, you can read LiveData.getValue() synchronously, but in RN
   // data only flows to JS via DeviceEventEmitter events. This method lets JS poll
   // the latest value at any time without waiting for the next event emission.
-  override fun getLatestRawPerformanceData(promise: Promise) {
+  @ReactMethod
+  fun getLatestRawPerformanceData(promise: Promise) {
     try {
       val data = latestRawData
       if (data != null) {
@@ -157,22 +170,23 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
 
   // ---------- Detailed collection ----------
 
-  override fun startDetailedPerformanceDataCollection(
+  @ReactMethod
+  fun startDetailedPerformanceDataCollection(
     classes: ReadableArray,
     delay: Double,
     promise: Promise
   ) {
     try {
-      val performanceClasses = IntArray(classes.size()) { classes.getInt(it) }
+      val perfClasses = IntArray(classes.size()) { classes.getInt(it) }
 
-      reactApplicationContext.runOnUiQueueThread {
+      UiThreadUtil.runOnUiThread {
         try {
           // Clean up any existing observer before starting
           removeActiveDetailedObserver()
           DroidDex.stopDetailedPerformanceDataCollection()
 
           val liveData = DroidDex.startDetailedPerformanceDataCollection(
-            *performanceClasses,
+            *perfClasses,
             delaySeconds = delay.toInt().coerceAtLeast(1)
           )
 
@@ -208,12 +222,13 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun updateDetailedPerformanceDataCollection(
+  @ReactMethod
+  fun updateDetailedPerformanceDataCollection(
     delay: Double,
     promise: Promise
   ) {
     try {
-      reactApplicationContext.runOnUiQueueThread {
+      UiThreadUtil.runOnUiThread {
         try {
           val updated = DroidDex.updateDetailedPerformanceDataCollection(
             delaySeconds = delay.toInt().coerceAtLeast(1)
@@ -229,8 +244,9 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun stopDetailedPerformanceDataCollection(promise: Promise) {
-    reactApplicationContext.runOnUiQueueThread {
+  @ReactMethod
+  fun stopDetailedPerformanceDataCollection(promise: Promise) {
+    UiThreadUtil.runOnUiThread {
       try {
         removeActiveDetailedObserver()
         DroidDex.stopDetailedPerformanceDataCollection()
@@ -245,7 +261,8 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
   // In native Android, you can read LiveData.getValue() synchronously, but in RN
   // data only flows to JS via DeviceEventEmitter events. This method lets JS poll
   // the latest value at any time without waiting for the next event emission.
-  override fun getLatestDetailedPerformanceData(promise: Promise) {
+  @ReactMethod
+  fun getLatestDetailedPerformanceData(promise: Promise) {
     try {
       val data = latestDetailedData
       if (data != null) {
@@ -260,7 +277,8 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
 
   // ---------- Performance levels ----------
 
-  override fun getWeightedPerformanceLevels(
+  @ReactMethod
+  fun getWeightedPerformanceLevels(
     classesWithWeights: ReadableArray,
     promise: Promise
   ) {
@@ -278,7 +296,8 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun getPerformanceLevel(performanceClass: Double, promise: Promise) {
+  @ReactMethod
+  fun getPerformanceLevel(performanceClass: Double, promise: Promise) {
     try {
       val level = DroidDex.getPerformanceLevel(performanceClass.toInt())
       promise.resolve(level.level.toDouble())
@@ -287,10 +306,23 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  // ---------- Event listener stubs (required by RN event emitter) ----------
+
+  @ReactMethod
+  fun addListener(eventName: String) {
+    // No-op: required by RN DeviceEventEmitter to suppress warnings
+  }
+
+  @ReactMethod
+  fun removeListeners(count: Double) {
+    // No-op: required by RN DeviceEventEmitter to suppress warnings
+  }
+
   // ---------- Shutdown ----------
 
-  override fun shutdown(promise: Promise) {
-    reactApplicationContext.runOnUiQueueThread {
+  @ReactMethod
+  fun shutdown(promise: Promise) {
+    UiThreadUtil.runOnUiThread {
       try {
         removeActiveObserver()
         removeActiveDetailedObserver()
@@ -302,13 +334,14 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun invalidate() {
-    reactApplicationContext.runOnUiQueueThread {
+  @Suppress("DEPRECATION")
+  override fun onCatalystInstanceDestroy() {
+    UiThreadUtil.runOnUiThread {
       removeActiveObserver()
       removeActiveDetailedObserver()
       DroidDex.shutdown()
     }
-    super.invalidate()
+    super.onCatalystInstanceDestroy()
   }
 
   // ---------- Internal helpers ----------
@@ -331,13 +364,11 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     latestDetailedData = null
   }
 
-  private fun convertRawDataToJson(rawData: RawPerformanceDataResult): String {
-    return JSONObject(rawData.toMap()).toString()
-  }
+  private fun convertRawDataToJson(raw: RawPerformanceDataResult): String =
+    JSONObject(raw.toMap()).toString()
 
-  private fun convertDetailedDataToJson(detailedData: DetailedPerformanceDataResult): String {
-    return JSONObject(detailedData.toMap()).toString()
-  }
+  private fun convertDetailedDataToJson(detailedData: DetailedPerformanceDataResult): String =
+    JSONObject(detailedData.toMap()).toString()
 
   private fun parseThresholdsFromJson(thresholdsJson: String): PerformanceThresholds {
     val json = JSONObject(thresholdsJson)
@@ -473,9 +504,5 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
         availableStorageGBThreshold = average.getDouble("availableStorageGBThreshold").toFloat()
       )
     )
-  }
-
-  companion object {
-    const val NAME = NativeDeviceMetricsSpec.NAME
   }
 }

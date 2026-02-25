@@ -18,4 +18,16 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/lokal-app/device-telemetry-toolkit")
+            credentials {
+                username = System.getenv("GITHUB_USERNAME") ?: "lokal-app"
+                password = System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
+    }
+}
+
 apply plugin: "com.facebook.react.rootproject"
