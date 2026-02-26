@@ -131,6 +131,7 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
       try {
         removeActiveObserver()
         DroidDex.stopRawPerformanceDataCollection()
+        latestRawData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("STOP_COLLECTION_ERROR", e.message, e)
@@ -234,6 +235,7 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
       try {
         removeActiveDetailedObserver()
         DroidDex.stopDetailedPerformanceDataCollection()
+        latestDetailedData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("STOP_DETAILED_COLLECTION_ERROR", e.message, e)
@@ -295,6 +297,8 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
         removeActiveObserver()
         removeActiveDetailedObserver()
         DroidDex.shutdown()
+        latestRawData = null
+        latestDetailedData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("SHUTDOWN_ERROR", e.message, e)
@@ -303,12 +307,15 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
   }
 
   override fun invalidate() {
+    val superInvalidate: () -> Unit = { super.invalidate() }
     reactApplicationContext.runOnUiQueueThread {
       removeActiveObserver()
       removeActiveDetailedObserver()
       DroidDex.shutdown()
+      latestRawData = null
+      latestDetailedData = null
+      superInvalidate()
     }
-    super.invalidate()
   }
 
   // ---------- Internal helpers ----------
@@ -319,7 +326,6 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
     activeObserver = null
     activeLiveData = null
-    latestRawData = null
   }
 
   private fun removeActiveDetailedObserver() {
@@ -328,7 +334,6 @@ class DeviceMetricsModule(reactContext: ReactApplicationContext) :
     }
     activeDetailedObserver = null
     activeDetailedLiveData = null
-    latestDetailedData = null
   }
 
   private fun convertRawDataToJson(rawData: RawPerformanceDataResult): String {

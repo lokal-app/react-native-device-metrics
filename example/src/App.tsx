@@ -11,7 +11,7 @@ import {
 import {
   init,
   PerformanceClass,
-  DEFAULT_THRESHOLDS,
+  getDefaultThresholds,
   startDetailedPerformanceDataCollection,
   stopDetailedPerformanceDataCollection,
   updateDetailedPerformanceDataCollection,
@@ -145,7 +145,7 @@ export default function App() {
 
   const initializeSDKWithCustomThresholds = async () => {
     try {
-      const customThresholds = DEFAULT_THRESHOLDS;
+      const customThresholds = getDefaultThresholds();
 
       customThresholds.memory.low.approxHeapRemainingInMBThreshold = 40;
       customThresholds.memory.average.approxHeapRemainingInMBThreshold = 128;

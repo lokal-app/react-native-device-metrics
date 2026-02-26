@@ -15,7 +15,7 @@ export type {
 export * from './types';
 
 // Thresholds
-export { DEFAULT_THRESHOLDS } from './defaultThresholds';
+export { getDefaultThresholds } from './defaultThresholds';
 
 // API
 export {

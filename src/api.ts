@@ -23,7 +23,7 @@ const getNativeModule = () => {
   if (DeviceMetrics == null) {
     throw new Error(
       'react-native-device-metrics: native module not found. Ensure the library is linked correctly. ' +
-        'For Expo, use a development build (not Expo Go). For React Native CLI, run pod install and rebuild.'
+        'For Expo, use a development build (not Expo Go). For React Native CLI, rebuild the app.'
     );
   }
 
@@ -36,7 +36,7 @@ const getNativeModule = () => {
  * Must be called once before using any other API.
  *
  * @param thresholds - Optional custom thresholds. If omitted, the SDK uses its built-in defaults.
- *                     Use `DEFAULT_THRESHOLDS` as a starting point and override specific values.
+ *                     Use `getDefaultThresholds()` to get a mutable copy and override specific values.
  */
 export const init = async (
   thresholds?: PerformanceThresholds

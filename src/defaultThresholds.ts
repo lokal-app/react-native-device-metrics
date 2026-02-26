@@ -1,7 +1,7 @@
 import type { PerformanceThresholds } from './types';
 
 // Default thresholds matching device-telemetry-toolkit defaults
-export const DEFAULT_THRESHOLDS: PerformanceThresholds = {
+const DEFAULT_THRESHOLDS: PerformanceThresholds = {
   memory: {
     low: {
       approxHeapRemainingInMBThreshold: 64,
@@ -94,3 +94,15 @@ export const DEFAULT_THRESHOLDS: PerformanceThresholds = {
     },
   },
 };
+
+/**
+ * Returns a deep copy of the default performance thresholds.
+ * Safe to mutate — each call returns a fresh independent copy.
+ *
+ * Uses JSON round-trip instead of structuredClone because TypeScript's
+ * ESNext lib does not include structuredClone types (available at runtime
+ * in Hermes since RN 0.73, but not in TS's type definitions).
+ * Safe here since DEFAULT_THRESHOLDS contains only plain numbers.
+ */
+export const getDefaultThresholds = (): PerformanceThresholds =>
+  JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS));

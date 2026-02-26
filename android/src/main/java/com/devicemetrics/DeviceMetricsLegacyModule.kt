@@ -143,6 +143,7 @@ class DeviceMetricsLegacyModule(
       try {
         removeActiveObserver()
         DroidDex.stopRawPerformanceDataCollection()
+        latestRawData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("STOP_COLLECTION_ERROR", e.message, e)
@@ -250,6 +251,7 @@ class DeviceMetricsLegacyModule(
       try {
         removeActiveDetailedObserver()
         DroidDex.stopDetailedPerformanceDataCollection()
+        latestDetailedData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("STOP_DETAILED_COLLECTION_ERROR", e.message, e)
@@ -327,6 +329,8 @@ class DeviceMetricsLegacyModule(
         removeActiveObserver()
         removeActiveDetailedObserver()
         DroidDex.shutdown()
+        latestRawData = null
+        latestDetailedData = null
         promise.resolve(null)
       } catch (e: Exception) {
         promise.reject("SHUTDOWN_ERROR", e.message, e)
@@ -336,12 +340,15 @@ class DeviceMetricsLegacyModule(
 
   @Suppress("DEPRECATION")
   override fun onCatalystInstanceDestroy() {
+    val superDestroy: () -> Unit = { super.onCatalystInstanceDestroy() }
     UiThreadUtil.runOnUiThread {
       removeActiveObserver()
       removeActiveDetailedObserver()
       DroidDex.shutdown()
+      latestRawData = null
+      latestDetailedData = null
+      superDestroy()
     }
-    super.onCatalystInstanceDestroy()
   }
 
   // ---------- Internal helpers ----------
@@ -352,7 +359,6 @@ class DeviceMetricsLegacyModule(
     }
     activeObserver = null
     activeLiveData = null
-    latestRawData = null
   }
 
   private fun removeActiveDetailedObserver() {
@@ -361,7 +367,6 @@ class DeviceMetricsLegacyModule(
     }
     activeDetailedObserver = null
     activeDetailedLiveData = null
-    latestDetailedData = null
   }
 
   private fun convertRawDataToJson(raw: RawPerformanceDataResult): String =
