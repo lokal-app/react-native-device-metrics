@@ -1,6 +1,6 @@
 {
   "name": "@lokal-dev/react-native-device-metrics",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Real-time device performance monitoring and telemetry for React Native (Android)",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
