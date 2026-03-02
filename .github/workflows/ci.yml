@@ -60,8 +60,14 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: read
+
     env:
       TURBO_CACHE_DIR: .turbo/android
+      GITHUB_USERNAME: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.DEVICE_TELEMETRY_GITHUB_TOKEN }}
 
     steps:
       - name: Checkout

@@ -16,7 +16,7 @@ import {
   stopDetailedPerformanceDataCollection,
   updateDetailedPerformanceDataCollection,
   getWeightedPerformanceLevels,
-} from 'react-native-device-metrics';
+} from '@lokal-dev/react-native-device-metrics';
 
 export default function App() {
   const [isInitialized, setIsInitialized] = useState(false);

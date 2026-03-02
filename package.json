@@ -1,7 +1,7 @@
 {
-  "name": "react-native-device-metrics",
+  "name": "@lokal-dev/react-native-device-metrics",
   "version": "0.1.0",
-  "description": "Device performance monitoring toolkit for React Native",
+  "description": "Real-time device performance monitoring and telemetry for React Native (Android)",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -14,6 +14,8 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "README.md",
+    "LICENSE",
     "src",
     "lib",
     "android",
@@ -45,20 +47,28 @@
     "react-native",
     "android",
     "expo",
-    "expo-dev-client"
+    "expo-dev-client",
+    "device-metrics",
+    "performance",
+    "telemetry",
+    "turbo-module"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lokal-app/react-native-device-metrics.git"
   },
-  "author": "prashantdixittt <prashant.dixit@getlokalapp.com> (https://github.com/lokal-app)",
+  "author": {
+    "name": "prashantdixittt",
+    "email": "prashant.dixit@getlokalapp.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/lokal-app/react-native-device-metrics/issues"
   },
   "homepage": "https://github.com/lokal-app/react-native-device-metrics#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.8.1",
