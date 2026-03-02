@@ -1,21 +1,2 @@
-#import "DeviceMetrics.h"
-
-@implementation DeviceMetrics
-- (NSNumber *)multiply:(double)a b:(double)b {
-    NSNumber *result = @(a * b);
-
-    return result;
-}
-
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
-    (const facebook::react::ObjCTurboModule::InitParams &)params
-{
-    return std::make_shared<facebook::react::NativeDeviceMetricsSpecJSI>(params);
-}
-
-+ (NSString *)moduleName
-{
-  return @"DeviceMetrics";
-}
-
-@end
+// react-native-device-metrics is Android-only.
+// This empty stub exists to satisfy CocoaPods on iOS builds.

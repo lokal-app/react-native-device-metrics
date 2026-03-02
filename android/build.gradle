@@ -7,11 +7,9 @@ buildscript {
   ]
 
   ext.getExtOrDefault = { prop ->
-    if (rootProject.ext.has(prop)) {
-      return rootProject.ext.get(prop)
-    }
-
-    return DeviceMetrics[prop]
+    return rootProject.ext.has(prop)
+      ? rootProject.ext.get(prop)
+      : DeviceMetrics[prop]
   }
 
   repositories {
@@ -21,15 +19,12 @@ buildscript {
 
   dependencies {
     classpath "com.android.tools.build:gradle:8.7.2"
-    // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
   }
 }
 
-
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-
 apply plugin: "com.facebook.react"
 
 android {
@@ -40,10 +35,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrDefault("minSdkVersion")
     targetSdkVersion getExtOrDefault("targetSdkVersion")
-  }
-
-  buildFeatures {
-    buildConfig true
+    consumerProguardFiles "consumer-rules.pro"
   }
 
   buildTypes {
@@ -52,16 +44,37 @@ android {
     }
   }
 
-  lint {
-    disable "GradleCompatible"
-  }
-
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
 }
 
+repositories {
+  google()
+  mavenCentral()
+
+  maven {
+    url = uri("https://maven.pkg.github.com/lokal-app/device-telemetry-toolkit")
+    credentials {
+      username = System.getenv("GITHUB_USERNAME") ?: "lokal-app"
+      password = System.getenv("GITHUB_TOKEN") ?: ""
+    }
+  }
+}
+
 dependencies {
   implementation "com.facebook.react:react-android"
+
+  implementation("com.lokalapps:device-telemetry-toolkit:1.0.0") {
+    exclude group: 'androidx.core', module: 'core-ktx'
+    exclude group: 'androidx.core', module: 'core'
+  }
+
+  // device-telemetry-toolkit transitively pulls core-ktx:1.17.0 which requires compileSdk 36.
+  // Excluding and pinning to 1.13.1 allows consumers on compileSdk 35 to build successfully.
+  // Safe today because the SDK does not use APIs added after core-ktx 1.13.1.
+  // TODO: Remove this workaround once all consumers are on compileSdk 36.
+  implementation "androidx.core:core-ktx:1.13.1"
+  implementation "androidx.core:core:1.13.1"
 }
