@@ -53,20 +53,12 @@ android {
 repositories {
   google()
   mavenCentral()
-
-  maven {
-    url = uri("https://maven.pkg.github.com/lokal-app/device-telemetry-toolkit")
-    credentials {
-      username = System.getenv("GITHUB_USERNAME") ?: "lokal-app"
-      password = System.getenv("GITHUB_TOKEN") ?: ""
-    }
-  }
 }
 
 dependencies {
   implementation "com.facebook.react:react-android"
 
-  implementation("com.lokalapps:device-telemetry-toolkit:1.0.0") {
+  implementation("com.lokalapps:device-telemetry-toolkit:1.0.1") {
     exclude group: 'androidx.core', module: 'core-ktx'
     exclude group: 'androidx.core', module: 'core'
   }
