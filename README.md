@@ -36,7 +36,7 @@ Real-time device performance monitoring and telemetry for React Native. Collect 
 - **minSdkVersion**: 24  
 - **compileSdkVersion**: 35+  
 
-This library depends on a native Android SDK published to **GitHub Packages**. The Android build must have access to that Maven repository (see [Installation](#installation)).
+This library depends on a native Android SDK published to **Maven Central**. No additional repository configuration is needed.
 
 ---
 
@@ -48,38 +48,15 @@ npm install @lokal-dev/react-native-device-metrics
 yarn add @lokal-dev/react-native-device-metrics
 ```
 
-Linking is automatic. You still need to configure the **GitHub Packages Maven repo** so the Android dependency can be resolved.
-
-### GitHub Packages (Android)
-
-Set these environment variables (token needs `read:packages`):
-
-```bash
-export GITHUB_USERNAME="your-github-username"
-export GITHUB_TOKEN="your-github-personal-access-token"
-```
+Linking is automatic. The native Android dependency resolves from **Maven Central** — no additional repository configuration needed.
 
 ### React Native CLI
 
-In your project’s **project-level** `android/build.gradle`:
-
-```groovy
-allprojects {
-    repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/lokal-app/device-telemetry-toolkit")
-            credentials {
-                username = System.getenv("GITHUB_USERNAME") ?: ""
-                password = System.getenv("GITHUB_TOKEN") ?: ""
-            }
-        }
-    }
-}
-```
+No additional setup required.
 
 ### Expo
 
-Add the config plugin in `app.json` (it configures the Maven repo):
+Add the config plugin in `app.json`:
 
 ```json
 {
