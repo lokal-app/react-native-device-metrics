@@ -34,9 +34,7 @@ Real-time device performance monitoring and telemetry for React Native. Collect 
 ### Android
 
 - **minSdkVersion**: 24  
-- **compileSdkVersion**: 35+  
-
-This library depends on a native Android SDK published to **Maven Central**. No additional repository configuration is needed.
+- **compileSdkVersion**: 36+
 
 ---
 
@@ -48,29 +46,13 @@ npm install @lokal-dev/react-native-device-metrics
 yarn add @lokal-dev/react-native-device-metrics
 ```
 
-Linking is automatic. The native Android dependency resolves from **Maven Central** — no additional repository configuration needed.
-
 ### React Native CLI
 
 No additional setup required.
 
 ### Expo
 
-Add the config plugin in `app.json`:
-
-```json
-{
-  "expo": {
-    "plugins": ["@lokal-dev/react-native-device-metrics"]
-  }
-}
-```
-
-Then create a **development build** (Expo Go is not supported):
-
-```bash
-npx expo run:android
-```
+No additional setup required. Expo Go is not supported — use a development build.
 
 ---
 
@@ -260,10 +242,6 @@ await DeviceMetrics.init(customThresholds);
 
 ## Troubleshooting
 
-### Build
-
-- **AGP / Kotlin version errors** — Align Android Gradle Plugin and Kotlin versions with React Native 0.73+ (e.g. Kotlin 1.8.0+).
-
 ### Runtime
 
 - **`Cannot read property 'init' of undefined`** — Clean build and Metro cache:
@@ -278,22 +256,24 @@ await DeviceMetrics.init(customThresholds);
 
 ## Publishing
 
-### Manual release
+Publishing is automated via GitHub Actions. The `publish.yml` workflow triggers on any `v*` tag push, runs validation, and publishes to npm with provenance attestation.
 
-1. Ensure you're logged in to npm: `npm login`
-2. Commit all changes, clean working tree.
-3. Build: `yarn prepare`
-4. Bump: `npm version patch` (or `minor` / `major`)
-5. Publish: `npm publish --access public`
-6. Push: `git push && git push --tags`
-
-### Automated (release-it)
+### Stable release
 
 ```bash
-yarn release
+git checkout main && git pull origin main
+yarn release          # select the next stable version e.g. 1.0.1
 ```
 
-This bumps version, tags, publishes to npm, and can create a GitHub release (if configured).
+release-it bumps `package.json`, generates `CHANGELOG.md`, commits, tags `v1.0.1`, and pushes. The tag push triggers the publish pipeline which publishes under the `latest` dist-tag.
+
+### Beta / pre-release
+
+```bash
+yarn release --preRelease=beta   # produces 1.0.1-beta.0, 1.0.1-beta.1, etc.
+```
+
+Published under the `beta` dist-tag — `latest` is not affected.
 
 ---
 
