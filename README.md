@@ -34,7 +34,7 @@ Real-time device performance monitoring and telemetry for React Native. Collect 
 ### Android
 
 - **minSdkVersion**: 24  
-- **compileSdkVersion**: 36+
+- **compileSdkVersion**: 35+
 
 ---
 
